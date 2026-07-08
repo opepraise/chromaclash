@@ -1,5 +1,5 @@
 export const USDM_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as const;
-export const CHROMACLASH_ADDRESS = "" as `0x${string}`; // fill after deploy
+export const CHROMACLASH_ADDRESS = "0xF7e10edB2CD2e3846d022413F8EB1f3a5A5f52f8" as `0x${string}`;
 
 export const CHROMACLASH_ABI = [
   { name: "placePixel", type: "function", stateMutability: "nonpayable", inputs: [{ name: "x", type: "uint16" }, { name: "y", type: "uint16" }, { name: "colorIdx", type: "uint8" }], outputs: [] },
