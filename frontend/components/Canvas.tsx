@@ -7,6 +7,9 @@ import { CHROMACLASH_ADDRESS, CHROMACLASH_ABI, ERC20_ABI, USDM_ADDRESS, PALETTE 
 const W = 100;
 const H = 100;
 const CELL = 4; // pixels per cell on canvas
+const MAX_BATCH = 20; // mirrors MAX_BATCH_SIZE in ChromaClash.sol
+const PIXEL_COST = BigInt("10000000000000000"); // 0.01 USDM
+const APPROVAL_COST = PIXEL_COST * BigInt(MAX_BATCH) * 5n; // covers several batches so the user isn't re-approving constantly
 
 // Local canvas state — rebuilt from events + user paint
 const canvasState = new Uint8Array(W * H); // colorIdx per cell, 0=empty(white)
@@ -31,9 +34,14 @@ export default function Canvas() {
     query: { refetchInterval: 10000 },
   });
   const { data: epochData } = useReadContract({ address: contract, abi: CHROMACLASH_ABI, functionName: "currentEpoch" });
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+    address: USDM_ADDRESS as `0x${string}`, abi: ERC20_ABI, functionName: "allowance",
+    args: address ? [address, contract] : undefined,
+  });
 
   const { writeContract: place } = useWriteContract();
-  const { writeContract: approve } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
+  const [sendingBatch, setSendingBatch] = useState(false);
 
   // Listen for PixelPlaced events and paint them
   useWatchContractEvent({
@@ -89,7 +97,7 @@ export default function Canvas() {
       // Add to batch
       setPendingPixels(prev => {
         const updated = [...prev.filter(([px, py]) => !(px === x && py === y)), [x, y, selectedColor]];
-        return updated.slice(-5); // max 5 batch
+        return updated.slice(-MAX_BATCH);
       });
       // Optimistic paint
       canvasState[y * W + x] = selectedColor;
@@ -104,16 +112,34 @@ export default function Canvas() {
     setTimeout(() => refetchCooldown(), 2000);
   }, [cooldown, selectedColor, contract, place, refetchCooldown]);
 
-  function sendBatch() {
-    if (pendingPixels.length === 0) return;
-    const filled = [...pendingPixels];
-    while (filled.length < 5) filled.push(filled[filled.length - 1]);
-    approve({
-      address: USDM_ADDRESS as `0x${string}`, abi: ERC20_ABI, functionName: "approve",
-      args: [contract, BigInt("40000000000000000")], // 0.04 USDM
-    });
-    // Note: in production, call placePixelBatch after approve confirms
-    setPendingPixels([]);
+  // Cost has a discount: every 5th pixel in the batch is free.
+  const batchCost = PIXEL_COST * BigInt(pendingPixels.length - Math.floor(pendingPixels.length / 5));
+
+  async function sendBatch() {
+    if (pendingPixels.length === 0 || sendingBatch) return;
+    setSendingBatch(true);
+    try {
+      if (!allowance || allowance < batchCost) {
+        await writeContractAsync({
+          address: USDM_ADDRESS as `0x${string}`, abi: ERC20_ABI, functionName: "approve",
+          args: [contract, APPROVAL_COST],
+        });
+        await refetchAllowance();
+      }
+
+      const xs = pendingPixels.map(([x]) => x);
+      const ys = pendingPixels.map(([, y]) => y);
+      const colors = pendingPixels.map(([, , c]) => c);
+      await writeContractAsync({
+        address: contract, abi: CHROMACLASH_ABI, functionName: "placePixelBatch",
+        args: [xs, ys, colors],
+      });
+
+      setPendingPixels([]);
+      refetchCooldown();
+    } finally {
+      setSendingBatch(false);
+    }
   }
 
   const cdSecs = cooldown ? Number(cooldown) : 0;
@@ -181,12 +207,13 @@ export default function Canvas() {
       {/* Cooldown info + batch */}
       {cdSecs > 0 && (
         <div className="bg-gray-900 rounded-xl p-3 space-y-2">
-          <p className="text-xs text-yellow-400">Cooldown active — click to queue pixels (up to 5)</p>
+          <p className="text-xs text-yellow-400">Cooldown active — click to queue pixels (up to {MAX_BATCH}, every 5th free)</p>
           {pendingPixels.length > 0 && (
             <div className="flex items-center justify-between">
               <p className="text-xs text-gray-400">{pendingPixels.length} pixel{pendingPixels.length !== 1 ? "s" : ""} queued</p>
-              <button onClick={sendBatch} className="text-xs bg-pink-600 hover:bg-pink-500 text-white px-3 py-1 rounded-lg">
-                Send batch (0.04 USDM)
+              <button onClick={sendBatch} disabled={sendingBatch}
+                className="text-xs bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white px-3 py-1 rounded-lg">
+                {sendingBatch ? "Sending…" : `Send batch (${Number(batchCost) / 1e18} USDM)`}
               </button>
             </div>
           )}

@@ -11,7 +11,7 @@ Inspired by r/Place — ChromaClash is a competitive pixel canvas where every ad
 - 100×100 shared canvas (10,000 pixels)
 - **Free**: place 1 pixel every 5 minutes at no cost
 - **Paid**: place immediately for 0.01 USDM (30s cooldown)
-- **Batch**: 5 pixels for 0.04 USDM (4th free)
+- **Batch**: queue up to 20 pixels and place them all in one transaction — every 5th pixel free
 - Paint over opponents' pixels to claim them
 - Your score = pixels you currently own on the canvas
 - Epoch lasts 7 days — top pixel-holder earns from the fee pool

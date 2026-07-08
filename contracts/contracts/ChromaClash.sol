@@ -15,6 +15,7 @@ contract ChromaClash is Ownable, ReentrancyGuard {
     uint256 public constant FREE_COOLDOWN = 5 minutes;
     uint256 public constant PAID_COOLDOWN = 30 seconds;
     uint256 public constant PAID_PIXEL_COST = 0.01 ether; // 0.01 USDM
+    uint256 public constant MAX_BATCH_SIZE = 20;
 
     // Epoch: each epoch is a new "battle round" (1 week)
     uint256 public currentEpoch;
@@ -75,13 +76,21 @@ contract ChromaClash is Ownable, ReentrancyGuard {
         _place(x, y, colorIdx, true);
     }
 
-    /// @notice Place 5 pixels at once (paid — 0.04 USDM for 5, slight discount)
-    function placePixelBatch(uint16[5] calldata xs, uint16[5] calldata ys, uint8[5] calldata colors) external nonReentrant {
-        uint256 batchCost = PAID_PIXEL_COST * 4; // pay for 4, get 5th free
-        require(usdm.transferFrom(msg.sender, address(this), batchCost), "Payment failed");
-        platformFeeBalance += batchCost;
+    /// @notice Place any number of pixels in a single transaction (paid). Every 5th pixel is free.
+    ///         Lets a player queue up a whole shape while painting and sign once instead of per pixel.
+    function placePixelBatch(uint16[] calldata xs, uint16[] calldata ys, uint8[] calldata colors) external nonReentrant {
+        uint256 len = xs.length;
+        require(len > 0 && len <= MAX_BATCH_SIZE, "Invalid batch size");
+        require(len == ys.length && len == colors.length, "Length mismatch");
 
-        for (uint8 i = 0; i < 5; i++) {
+        uint256 payableCount = len - (len / 5);
+        uint256 batchCost = payableCount * PAID_PIXEL_COST;
+        if (batchCost > 0) {
+            require(usdm.transferFrom(msg.sender, address(this), batchCost), "Payment failed");
+            platformFeeBalance += batchCost;
+        }
+
+        for (uint256 i = 0; i < len; i++) {
             require(xs[i] < WIDTH && ys[i] < HEIGHT, "Out of bounds");
             require(colors[i] < MAX_COLORS, "Invalid color");
             _place(xs[i], ys[i], colors[i], true);

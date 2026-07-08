@@ -56,7 +56,7 @@ export default function Scoreboard() {
           <p>• Defend your territory or paint more</p>
           <p>• Free: 1 pixel every 5 minutes</p>
           <p>• Paid: 0.01 USDM for immediate placement (30s cooldown)</p>
-          <p>• Batch: 0.04 USDM for 5 pixels at once</p>
+          <p>• Batch: queue up to 20 pixels, sign once — every 5th free</p>
           <p>• Top painter at epoch end wins from the fee pool</p>
         </div>
       </div>
