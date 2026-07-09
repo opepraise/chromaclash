@@ -19,10 +19,12 @@ Inspired by r/Place — ChromaClash is a competitive pixel canvas where every ad
 
 ## Features
 
-- 16-color palette
-- Real-time canvas via on-chain event streaming
+- Landing page + in-game canvas, each with independent light/dark themes
+- 16-color palette across three paint modes: Free, Instant, and Batch
+- Real-time canvas, leaderboard, and live feed — all rebuilt from on-chain `PixelPlaced` events
 - Optimistic UI — paint shows immediately, confirmed on-chain
 - Epoch countdown and live pixel count
+- Wallet connect modal (injected/MiniPay/Valora, MetaMask, and optionally WalletConnect)
 - Completely free to start playing
 
 ## Stack
@@ -37,8 +39,11 @@ Inspired by r/Place — ChromaClash is a competitive pixel canvas where every ad
 cd contracts && npm install
 npx hardhat compile
 npx hardhat run scripts/deploy.ts --network celo
+npx hardhat verify --network celo <deployed-address> <usdm-address>
 
 # Update CHROMACLASH_ADDRESS in frontend/lib/contracts.ts
 cd ../frontend && npm install
 npm run dev
 ```
+
+Optional: set `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` in `frontend/.env.local` (from [WalletConnect Cloud](https://cloud.reown.com)) to enable the WalletConnect option in the connect modal.
