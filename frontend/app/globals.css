@@ -1,4 +1,78 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body { @apply bg-gray-950 text-white; }
+
+:root {
+  --bg: #0b0d13;
+  --surface: #141826;
+  --surface2: #1b2032;
+  --border: #262c42;
+  --border2: #333b58;
+  --text: #f2f4fa;
+  --muted: #8a92a8;
+  --accent: #fcff52;
+  --accent-ink: #14161f;
+  --canvas-empty: #11141d;
+  --danger: #ff5c5c;
+  --ok: #4ade80;
+  --brand: #fcff52;
+  --brand-glow: 0 0 12px rgba(252, 255, 82, 0.35);
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f3ec;
+  --surface: #ffffff;
+  --surface2: #f1f0e6;
+  --border: #e0dfd2;
+  --border2: #c9c8b8;
+  --text: #16181f;
+  --muted: #6e7484;
+  --accent: #16181f;
+  --accent-ink: #fcff52;
+  --canvas-empty: #fcfbf4;
+  --danger: #d93a3a;
+  --ok: #1b9a50;
+  --brand: #5f6400;
+  --brand-glow: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), monospace;
+}
+
+@keyframes ccFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ccPixelPulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@keyframes ccPop {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ccBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes ccFall {
+  0% { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(360px) rotate(340deg); opacity: 0; }
+}
+@keyframes ccBounceIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-fade-up { animation: ccFadeUp 0.5s ease both; }
+.animate-pop { animation: ccPop 0.2s ease; }
+.animate-blink { animation: ccBlink 1.6s infinite; }
+.animate-bounce-in { animation: ccBounceIn 0.5s 0.1s ease both; }
