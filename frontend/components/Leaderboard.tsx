@@ -1,7 +1,7 @@
 "use client";
 
-import { useAccount, useReadContract } from "wagmi";
-import { CHROMACLASH_ADDRESS, CHROMACLASH_ABI, PALETTE } from "@/lib/contracts";
+import { useAccount } from "wagmi";
+import { PALETTE } from "@/lib/contracts";
 
 function shortAddr(a: string) {
   return `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -14,26 +14,15 @@ export default function Leaderboard({
   onPreviewWinner: () => void;
 }) {
   const { address } = useAccount();
-  const { data: feeBalance } = useReadContract({
-    address: CHROMACLASH_ADDRESS, abi: CHROMACLASH_ABI, functionName: "platformFeeBalance",
-    query: { refetchInterval: 10000 },
-  });
 
   const rows = [...counts.entries()]
     .map(([owner, n]) => ({ owner, n, color: PALETTE[Math.abs(hashCode(owner)) % PALETTE.length] }))
     .sort((a, b) => b.n - a.n)
     .slice(0, 5);
 
-  const prizePool = feeBalance !== undefined ? (Number(feeBalance) / 1e18).toFixed(2) : "0.00";
-
   return (
     <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <div className="mb-3 flex items-center justify-between">
-        <div className="font-display text-[11px]" style={{ color: "var(--muted)" }}>LEADERBOARD</div>
-        <div className="text-xs" style={{ color: "var(--muted)" }}>
-          prize pool <span className="font-bold" style={{ color: "var(--text)" }}>{prizePool} USDM</span>
-        </div>
-      </div>
+      <div className="mb-3 font-display text-[11px]" style={{ color: "var(--muted)" }}>LEADERBOARD</div>
       <div className="flex flex-col gap-1.5">
         {rows.length === 0 && (
           <p className="py-3 text-center text-xs" style={{ color: "var(--muted)" }}>No pixels placed yet this epoch</p>

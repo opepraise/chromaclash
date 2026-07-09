@@ -1,22 +1,15 @@
-export const USDM_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as const;
-export const CHROMACLASH_ADDRESS = "0xF7e10edB2CD2e3846d022413F8EB1f3a5A5f52f8" as `0x${string}`;
+export const CHROMACLASH_ADDRESS = "0xDDF8f6647bE7E9720257A9452ED7901570874c37" as `0x${string}`;
 // Block the contract was deployed at — bounds event log queries so we don't scan from chain genesis.
-export const CHROMACLASH_DEPLOY_BLOCK = 71646900n;
+export const CHROMACLASH_DEPLOY_BLOCK = 71685900n;
 
 export const CHROMACLASH_ABI = [
   { name: "placePixel", type: "function", stateMutability: "nonpayable", inputs: [{ name: "x", type: "uint16" }, { name: "y", type: "uint16" }, { name: "colorIdx", type: "uint8" }], outputs: [] },
-  { name: "placePixelPaid", type: "function", stateMutability: "nonpayable", inputs: [{ name: "x", type: "uint16" }, { name: "y", type: "uint16" }, { name: "colorIdx", type: "uint8" }], outputs: [] },
-  { name: "placePixelBatch", type: "function", stateMutability: "nonpayable", inputs: [{ name: "xs", type: "uint16[]" }, { name: "ys", type: "uint16[]" }, { name: "colors", type: "uint8[]" }], outputs: [] },
-  { name: "MAX_BATCH_SIZE", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   { name: "getPixelCooldown", type: "function", stateMutability: "view", inputs: [{ name: "player", type: "address" }], outputs: [{ name: "remaining", type: "uint256" }] },
   { name: "getPlayerPixels", type: "function", stateMutability: "view", inputs: [{ name: "player", type: "address" }], outputs: [{ name: "", type: "uint32" }] },
   { name: "currentEpoch", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   { name: "epochStart", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   { name: "lastPlaced", type: "function", stateMutability: "view", inputs: [{ name: "", type: "uint256" }, { name: "", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
-  { name: "FREE_COOLDOWN", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
-  { name: "PAID_COOLDOWN", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
-  { name: "PAID_PIXEL_COST", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
-  { name: "platformFeeBalance", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "COOLDOWN", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   {
     name: "PixelPlaced", type: "event",
     inputs: [
@@ -25,16 +18,9 @@ export const CHROMACLASH_ABI = [
       { name: "x", type: "uint16", indexed: false },
       { name: "y", type: "uint16", indexed: false },
       { name: "colorIdx", type: "uint8", indexed: false },
-      { name: "paid", type: "bool", indexed: false },
     ],
   },
   { name: "NewEpoch", type: "event", inputs: [{ name: "epoch", type: "uint256", indexed: true }, { name: "startTime", type: "uint256", indexed: false }] },
-] as const;
-
-export const ERC20_ABI = [
-  { name: "approve", type: "function", stateMutability: "nonpayable", inputs: [{ name: "spender", type: "address" }, { name: "amount", type: "uint256" }], outputs: [{ name: "", type: "bool" }] },
-  { name: "balanceOf", type: "function", stateMutability: "view", inputs: [{ name: "account", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
-  { name: "allowance", type: "function", stateMutability: "view", inputs: [{ name: "owner", type: "address" }, { name: "spender", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
 ] as const;
 
 // 16 colors available on the palette

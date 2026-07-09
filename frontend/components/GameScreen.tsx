@@ -9,7 +9,6 @@ import { useChromaClash } from "@/lib/useChromaClash";
 import { usePixelPainter } from "@/lib/usePixelPainter";
 import Logo, { Wordmark } from "./Logo";
 import Canvas from "./Canvas";
-import BatchBar from "./BatchBar";
 import ModePanel from "./ModePanel";
 import Leaderboard from "./Leaderboard";
 import LiveFeed from "./LiveFeed";
@@ -83,7 +82,6 @@ export default function GameScreen({ onGoLanding }: { onGoLanding: () => void })
               className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
               style={{ borderColor: "var(--border)", background: "var(--surface)" }}
             >
-              <span className="font-bold">{(Number(painter.usdmBalance) / 1e18).toFixed(2)} USDM</span>
               <span className="font-display text-[11px]" style={{ color: "var(--muted)" }}>
                 {address.slice(0, 6)}…{address.slice(-4)}
               </span>
@@ -119,29 +117,16 @@ export default function GameScreen({ onGoLanding }: { onGoLanding: () => void })
           <Canvas
             pixels={pixels}
             optimistic={painter.optimistic}
-            queue={painter.queue}
             onCellClick={handleCellClick}
             paintedCount={paintedCount}
           />
-          {painter.mode === "batch" && (
-            <BatchBar
-              queueLength={painter.queue.length}
-              batchCost={painter.batchCost}
-              sending={painter.sending}
-              onClear={painter.cancelBatch}
-              onConfirm={painter.confirmBatch}
-            />
-          )}
         </div>
 
         <div className="flex min-w-[280px] max-w-[380px] flex-[1_1_300px] flex-col gap-3">
           <ModePanel
-            mode={painter.mode}
-            setMode={painter.setMode}
             selectedColor={painter.selectedColor}
             setSelectedColor={painter.setSelectedColor}
-            freeRemaining={painter.freeRemaining}
-            paidRemaining={painter.paidRemaining}
+            cooldownRemaining={painter.cooldownRemaining}
           />
           <Leaderboard counts={counts} onPreviewWinner={() => setModal("winner")} />
           <LiveFeed feed={feed} />

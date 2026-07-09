@@ -3,10 +3,9 @@
 import Modal from "./Modal";
 
 const STEPS = [
-  { n: "1", color: "#94E044", title: "Pick a color, click a pixel", body: "Free mode gives you one pixel every 5 minutes. No wallet balance needed to start." },
+  { n: "1", color: "#94E044", title: "Pick a color, click a pixel", body: "Completely free — no wallet balance needed. Just a 5-second cooldown between pixels." },
   { n: "2", color: "#00D3DD", title: "Steal territory", body: "Painting over an opponent's pixel claims it for you. They can steal it right back — hold your ground." },
-  { n: "3", color: "#E59500", title: "Go faster with USDM", body: "Instant pixels cost 0.01 USDM with a 30s cooldown. Batches queue up to 20 pixels and sign once — every 5th is free." },
-  { n: "4", color: "#CF6EE4", title: "Win the epoch", body: "After 7 days, whoever owns the most pixels takes the fee pool. Canvas wipes, new war begins." },
+  { n: "3", color: "#CF6EE4", title: "Win the epoch", body: "After 7 days, whoever owns the most pixels tops the leaderboard. Canvas wipes, new war begins." },
 ];
 
 export default function HowToModal({ onClose }: { onClose: () => void }) {

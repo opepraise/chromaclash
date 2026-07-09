@@ -31,7 +31,7 @@ export default function LiveFeed({ feed }: { feed: FeedItem[] }) {
                 {you ? "You" : `${f.placer.slice(0, 6)}…${f.placer.slice(-4)}`}
               </span>
               <span className="flex-1 truncate" style={{ color: "var(--muted)" }}>
-                {f.paid ? "placed" : "claimed"} ({f.x},{f.y})
+                claimed ({f.x},{f.y})
               </span>
               <span className="text-[11px]" style={{ color: "var(--muted)" }}>{secs}s</span>
             </div>

@@ -10,11 +10,10 @@ const CELL = 6;
 type PixelMap = Map<number, { colorIdx: number; owner: `0x${string}` }>;
 
 export default function Canvas({
-  pixels, optimistic, queue, onCellClick, paintedCount,
+  pixels, optimistic, onCellClick, paintedCount,
 }: {
   pixels: PixelMap;
   optimistic: Map<number, number>;
-  queue: Array<{ i: number; c: number }>;
   onCellClick: (x: number, y: number) => void;
   paintedCount: number;
 }) {
@@ -62,14 +61,6 @@ export default function Canvas({
       ctx.beginPath(); ctx.moveTo(0, g * CELL + 0.5); ctx.lineTo(SIZE * CELL, g * CELL + 0.5); ctx.stroke();
     }
 
-    for (const q of queue) {
-      const x = q.i % SIZE, y = Math.floor(q.i / SIZE);
-      ctx.strokeStyle = "#FCFF52"; ctx.lineWidth = 2;
-      ctx.strokeRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
-      ctx.fillStyle = PALETTE[q.c] + "AA";
-      ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2);
-    }
-
     const nowT = performance.now();
     for (const f of flashes.current) {
       const age = (nowT - f.t0) / 500;
@@ -113,7 +104,7 @@ export default function Canvas({
     }
   }, [optimistic]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { draw(); }); // redraw on every render (pixels/queue/theme change)
+  useEffect(() => { draw(); }); // redraw on every render (pixels/theme change)
 
   function idxFromEvent(e: React.MouseEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;

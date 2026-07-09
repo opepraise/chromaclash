@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useReadContract } from "wagmi";
-import { CHROMACLASH_ADDRESS, CHROMACLASH_ABI, PALETTE } from "@/lib/contracts";
+import { PALETTE } from "@/lib/contracts";
 import Modal from "./Modal";
 
 function shortAddr(a: string) {
@@ -22,12 +21,7 @@ export default function WinnerModal({
   currentEpoch: bigint | undefined;
   onClose: () => void;
 }) {
-  const { data: feeBalance } = useReadContract({
-    address: CHROMACLASH_ADDRESS, abi: CHROMACLASH_ABI, functionName: "platformFeeBalance",
-  });
-
   const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-  const prizePool = feeBalance !== undefined ? Number(feeBalance) / 1e18 : 0;
 
   const confetti = useMemo(() => Array.from({ length: 22 }, () => ({
     left: `${(Math.random() * 96).toFixed(1)}%`,
@@ -71,8 +65,7 @@ export default function WinnerModal({
                 <span className="text-base font-bold">{shortAddr(top[0])}</span>
               </div>
               <div className="text-[13px]" style={{ color: "var(--muted)" }}>
-                {top[1]} pixels held · would win{" "}
-                <span className="font-bold" style={{ color: "var(--text)" }}>{(prizePool * 0.6).toFixed(2)} USDM</span>
+                leads with <span className="font-bold" style={{ color: "var(--text)" }}>{top[1]} pixels</span> held
               </div>
             </>
           ) : (

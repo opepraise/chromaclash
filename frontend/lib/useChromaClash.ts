@@ -10,7 +10,6 @@ export type FeedItem = {
   x: number;
   y: number;
   colorIdx: number;
-  paid: boolean;
   t: number;
 };
 
@@ -45,13 +44,13 @@ export function useChromaClash(currentEpoch: bigint | undefined) {
       const map = new Map<number, { colorIdx: number; owner: `0x${string}` }>();
       const feedItems: FeedItem[] = [];
       for (const log of logs) {
-        const { placer, x, y, colorIdx, paid } = log.args as {
-          placer: `0x${string}`; x: number; y: number; colorIdx: number; paid: boolean;
+        const { placer, x, y, colorIdx } = log.args as {
+          placer: `0x${string}`; x: number; y: number; colorIdx: number;
         };
         map.set(Number(y) * W + Number(x), { colorIdx: Number(colorIdx), owner: placer });
         const key = `${log.blockNumber ?? 0n}-${log.logIndex ?? 0}`;
         seenKeys.current.add(key);
-        feedItems.push({ key, placer, x: Number(x), y: Number(y), colorIdx: Number(colorIdx), paid: !!paid, t: Date.now() });
+        feedItems.push({ key, placer, x: Number(x), y: Number(y), colorIdx: Number(colorIdx), t: Date.now() });
       }
       setPixels(map);
       setFeed(feedItems.slice(-8).reverse());
@@ -87,10 +86,10 @@ export function useChromaClash(currentEpoch: bigint | undefined) {
 
       setFeed(prev => {
         const additions = fresh.map(log => {
-          const a = log.args as { placer: `0x${string}`; x: number; y: number; colorIdx: number; paid: boolean };
+          const a = log.args as { placer: `0x${string}`; x: number; y: number; colorIdx: number };
           return {
             key: `${log.blockNumber ?? 0n}-${log.logIndex ?? 0}`,
-            placer: a.placer, x: Number(a.x), y: Number(a.y), colorIdx: Number(a.colorIdx), paid: !!a.paid,
+            placer: a.placer, x: Number(a.x), y: Number(a.y), colorIdx: Number(a.colorIdx),
             t: Date.now(),
           };
         }).reverse();

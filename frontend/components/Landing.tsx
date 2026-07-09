@@ -81,7 +81,7 @@ export default function Landing({
             10,000 PIXELS.<br />ZERO MERCY.
           </h1>
           <p className="mb-7 max-w-[460px] text-[17px] leading-relaxed" style={{ color: "var(--muted)" }}>
-            A live pixel war on a shared 100×100 canvas. Paint for free, steal territory from strangers, and hold the most ground when the epoch ends to win the prize pool.
+            A live pixel war on a shared 100×100 canvas. Completely free to play — paint, steal territory from strangers, and hold the most ground when the epoch ends to top the leaderboard.
           </p>
           <div className="flex flex-wrap gap-3">
             <button
@@ -106,7 +106,7 @@ export default function Landing({
             </div>
             <div>
               <div className="font-display text-xl">FREE</div>
-              <div className="text-[13px]" style={{ color: "var(--muted)" }}>1 pixel / 5 min</div>
+              <div className="text-[13px]" style={{ color: "var(--muted)" }}>always, no USDM needed</div>
             </div>
             <div>
               <div className="font-display text-xl">7 DAYS</div>
@@ -136,8 +136,8 @@ export default function Landing({
           style={{ borderColor: "var(--border)", background: "var(--surface)", animationDelay: "0.15s" }}
         >
           <div className="font-display mb-3 text-[13px]" style={{ color: "#94E044" }}>01 · PAINT</div>
-          <div className="mb-2 text-lg font-bold">Free pixel every 5 minutes</div>
-          <div className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>Pick from 16 colors and drop a pixel anywhere. No wallet balance needed to start fighting.</div>
+          <div className="mb-2 text-lg font-bold">Free pixel every 5 seconds</div>
+          <div className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>Pick from 16 colors and drop a pixel anywhere. No USDM, no wallet balance needed — ever.</div>
         </div>
         <div
           className="animate-fade-up rounded-2xl border p-[26px] transition-transform hover:-translate-y-1"
@@ -152,8 +152,8 @@ export default function Landing({
           style={{ borderColor: "var(--border)", background: "var(--surface)", animationDelay: "0.41s" }}
         >
           <div className="font-display mb-3 text-[13px]" style={{ color: "#CF6EE4" }}>03 · CONQUER</div>
-          <div className="mb-2 text-lg font-bold">Hold ground, win the pool</div>
-          <div className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>Your score is the pixels you own when the 7-day epoch ends. Top holder takes the fee pool. Then the canvas wipes.</div>
+          <div className="mb-2 text-lg font-bold">Hold ground, top the board</div>
+          <div className="text-sm leading-relaxed" style={{ color: "var(--muted)" }}>Your score is the pixels you own when the 7-day epoch ends. Then the canvas wipes and a fresh war begins.</div>
         </div>
       </div>
 
@@ -162,11 +162,9 @@ export default function Landing({
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         <div>
-          <div className="font-display mb-1.5 text-[13px]" style={{ color: "var(--muted)" }}>NEED PIXELS FASTER?</div>
+          <div className="font-display mb-1.5 text-[13px]" style={{ color: "var(--muted)" }}>NO CATCH</div>
           <div className="text-base font-semibold">
-            Instant pixel <span className="font-normal" style={{ color: "var(--muted)" }}>0.01 USDM · 30s cooldown</span>
-            {" "}·{" "}
-            Batch <span className="font-normal" style={{ color: "var(--muted)" }}>sign once, every 5th pixel free</span>
+            No USDM, no fees, no premium tier<span className="font-normal" style={{ color: "var(--muted)" }}> — just a 5-second cooldown between pixels</span>
           </div>
         </div>
         <button
