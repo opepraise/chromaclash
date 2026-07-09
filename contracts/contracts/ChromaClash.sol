@@ -2,20 +2,14 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @notice ChromaClash — on-chain pixel canvas war. Players place colored pixels on a shared canvas.
-/// Free to place; optional USDM to place faster or buy color packs. Canvas state is rebuilt from events.
-contract ChromaClash is Ownable, ReentrancyGuard {
-    IERC20 public immutable usdm;
-
+/// @notice ChromaClash — on-chain pixel canvas war. Completely free to play; a short
+/// per-address cooldown is the only thing standing between you and total canvas domination.
+/// Canvas state is rebuilt from events.
+contract ChromaClash is Ownable {
     uint16 public constant WIDTH = 100;
     uint16 public constant HEIGHT = 100;
-    uint256 public constant FREE_COOLDOWN = 5 minutes;
-    uint256 public constant PAID_COOLDOWN = 30 seconds;
-    uint256 public constant PAID_PIXEL_COST = 0.01 ether; // 0.01 USDM
-    uint256 public constant MAX_BATCH_SIZE = 20;
+    uint256 public constant COOLDOWN = 5 seconds;
 
     // Epoch: each epoch is a new "battle round" (1 week)
     uint256 public currentEpoch;
@@ -32,72 +26,24 @@ contract ChromaClash is Ownable, ReentrancyGuard {
     // Score per address per epoch (pixels owned)
     mapping(uint256 => mapping(address => uint32)) public pixelCount;
 
-    // Color palette index → color (stored as bytes3 = RGB)
-    // Colors defined off-chain, on-chain we just store palette index 0-15
+    // Color palette index → color (defined off-chain, on-chain we just store palette index 0-15)
     uint8 public constant MAX_COLORS = 16;
 
-    uint256 public platformFeeBalance;
-
-    event PixelPlaced(
-        uint256 indexed epoch,
-        address indexed placer,
-        uint16 x,
-        uint16 y,
-        uint8 colorIdx,
-        bool paid
-    );
-    event EpochEnded(uint256 indexed epoch, address indexed topPlayer, uint32 pixels);
+    event PixelPlaced(uint256 indexed epoch, address indexed placer, uint16 x, uint16 y, uint8 colorIdx);
     event NewEpoch(uint256 indexed epoch, uint256 startTime);
 
-    constructor(address _usdm) Ownable(msg.sender) {
-        usdm = IERC20(_usdm);
+    constructor() Ownable(msg.sender) {
         epochStart = block.timestamp;
         currentEpoch = 0;
         emit NewEpoch(0, block.timestamp);
     }
 
-    /// @notice Place a single pixel for free (subject to cooldown)
+    /// @notice Place a pixel for free, subject to a short per-address cooldown.
     function placePixel(uint16 x, uint16 y, uint8 colorIdx) external {
         require(x < WIDTH && y < HEIGHT, "Out of bounds");
         require(colorIdx < MAX_COLORS, "Invalid color");
-        require(block.timestamp >= lastPlaced[currentEpoch][msg.sender] + FREE_COOLDOWN, "Cooldown active");
+        require(block.timestamp >= lastPlaced[currentEpoch][msg.sender] + COOLDOWN, "Cooldown active");
 
-        _place(x, y, colorIdx, false);
-    }
-
-    /// @notice Place a pixel immediately by paying USDM (bypasses cooldown)
-    function placePixelPaid(uint16 x, uint16 y, uint8 colorIdx) external nonReentrant {
-        require(x < WIDTH && y < HEIGHT, "Out of bounds");
-        require(colorIdx < MAX_COLORS, "Invalid color");
-        require(block.timestamp >= lastPlaced[currentEpoch][msg.sender] + PAID_COOLDOWN, "Paid cooldown active");
-        require(usdm.transferFrom(msg.sender, address(this), PAID_PIXEL_COST), "Payment failed");
-
-        platformFeeBalance += PAID_PIXEL_COST;
-        _place(x, y, colorIdx, true);
-    }
-
-    /// @notice Place any number of pixels in a single transaction (paid). Every 5th pixel is free.
-    ///         Lets a player queue up a whole shape while painting and sign once instead of per pixel.
-    function placePixelBatch(uint16[] calldata xs, uint16[] calldata ys, uint8[] calldata colors) external nonReentrant {
-        uint256 len = xs.length;
-        require(len > 0 && len <= MAX_BATCH_SIZE, "Invalid batch size");
-        require(len == ys.length && len == colors.length, "Length mismatch");
-
-        uint256 payableCount = len - (len / 5);
-        uint256 batchCost = payableCount * PAID_PIXEL_COST;
-        if (batchCost > 0) {
-            require(usdm.transferFrom(msg.sender, address(this), batchCost), "Payment failed");
-            platformFeeBalance += batchCost;
-        }
-
-        for (uint256 i = 0; i < len; i++) {
-            require(xs[i] < WIDTH && ys[i] < HEIGHT, "Out of bounds");
-            require(colors[i] < MAX_COLORS, "Invalid color");
-            _place(xs[i], ys[i], colors[i], true);
-        }
-    }
-
-    function _place(uint16 x, uint16 y, uint8 colorIdx, bool paid) internal {
         _maybeAdvanceEpoch();
 
         address prev = pixelOwner[currentEpoch][x][y];
@@ -110,15 +56,9 @@ contract ChromaClash is Ownable, ReentrancyGuard {
 
         pixelOwner[currentEpoch][x][y] = msg.sender;
         pixelCount[currentEpoch][msg.sender]++;
+        lastPlaced[currentEpoch][msg.sender] = block.timestamp;
 
-        if (!paid) {
-            lastPlaced[currentEpoch][msg.sender] = block.timestamp;
-        } else {
-            // Paid cooldown is much shorter
-            lastPlaced[currentEpoch][msg.sender] = block.timestamp - FREE_COOLDOWN + PAID_COOLDOWN;
-        }
-
-        emit PixelPlaced(currentEpoch, msg.sender, x, y, colorIdx, paid);
+        emit PixelPlaced(currentEpoch, msg.sender, x, y, colorIdx);
     }
 
     function _maybeAdvanceEpoch() internal {
@@ -132,7 +72,7 @@ contract ChromaClash is Ownable, ReentrancyGuard {
     function getPixelCooldown(address player) external view returns (uint256 remaining) {
         uint256 last = lastPlaced[currentEpoch][player];
         if (last == 0) return 0;
-        uint256 ready = last + FREE_COOLDOWN;
+        uint256 ready = last + COOLDOWN;
         if (block.timestamp >= ready) return 0;
         return ready - block.timestamp;
     }
@@ -143,12 +83,6 @@ contract ChromaClash is Ownable, ReentrancyGuard {
 
     function getPlayerPixelsForEpoch(address player, uint256 epoch) external view returns (uint32) {
         return pixelCount[epoch][player];
-    }
-
-    function withdrawFees() external onlyOwner {
-        uint256 amount = platformFeeBalance;
-        platformFeeBalance = 0;
-        require(usdm.transfer(owner(), amount), "Transfer failed");
     }
 
     function forceAdvanceEpoch() external onlyOwner {
