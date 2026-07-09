@@ -1,5 +1,7 @@
 export const USDM_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a" as const;
 export const CHROMACLASH_ADDRESS = "0xF7e10edB2CD2e3846d022413F8EB1f3a5A5f52f8" as `0x${string}`;
+// Block the contract was deployed at — bounds event log queries so we don't scan from chain genesis.
+export const CHROMACLASH_DEPLOY_BLOCK = 71646900n;
 
 export const CHROMACLASH_ABI = [
   { name: "placePixel", type: "function", stateMutability: "nonpayable", inputs: [{ name: "x", type: "uint16" }, { name: "y", type: "uint16" }, { name: "colorIdx", type: "uint8" }], outputs: [] },
@@ -10,6 +12,11 @@ export const CHROMACLASH_ABI = [
   { name: "getPlayerPixels", type: "function", stateMutability: "view", inputs: [{ name: "player", type: "address" }], outputs: [{ name: "", type: "uint32" }] },
   { name: "currentEpoch", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   { name: "epochStart", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "lastPlaced", type: "function", stateMutability: "view", inputs: [{ name: "", type: "uint256" }, { name: "", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
+  { name: "FREE_COOLDOWN", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "PAID_COOLDOWN", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "PAID_PIXEL_COST", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
+  { name: "platformFeeBalance", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] },
   {
     name: "PixelPlaced", type: "event",
     inputs: [
@@ -32,7 +39,6 @@ export const ERC20_ABI = [
 
 // 16 colors available on the palette
 export const PALETTE = [
-  "#ffffff", "#000000", "#ff0000", "#00ff00", "#0000ff", "#ffff00",
-  "#ff00ff", "#00ffff", "#ff8800", "#8800ff", "#00ff88", "#ff0088",
-  "#888888", "#444444", "#ffccaa", "#aaccff",
+  "#FFFFFF", "#E4E4E4", "#888888", "#222222", "#FFA7D1", "#E50000", "#E59500", "#A06A42",
+  "#E5D900", "#94E044", "#02BE01", "#00D3DD", "#0083C7", "#0000EA", "#CF6EE4", "#820080",
 ] as const;
