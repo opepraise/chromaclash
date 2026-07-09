@@ -1,6 +1,7 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, useConnect } from "wagmi";
+import { celo } from "wagmi/chains";
 import { wagmiConfig } from "@/lib/wagmi";
 import { useEffect } from "react";
 
@@ -8,7 +9,7 @@ const queryClient = new QueryClient();
 
 function AutoConnect() {
   const { connect, connectors } = useConnect();
-  useEffect(() => { if (connectors[0]) connect({ connector: connectors[0] }); }, [connect, connectors]);
+  useEffect(() => { if (connectors[0]) connect({ connector: connectors[0], chainId: celo.id }); }, [connect, connectors]);
   return null;
 }
 

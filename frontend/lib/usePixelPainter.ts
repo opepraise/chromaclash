@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { celo } from "wagmi/chains";
 import { CHROMACLASH_ADDRESS, CHROMACLASH_ABI, ERC20_ABI, USDM_ADDRESS } from "./contracts";
 import { useToast } from "./toast";
 
@@ -72,7 +73,7 @@ export function usePixelPainter(pixels: Map<number, { colorIdx: number; owner: `
     if (allowance && allowance >= cost) return;
     await writeContractAsync({
       address: USDM_ADDRESS as `0x${string}`, abi: ERC20_ABI, functionName: "approve",
-      args: [CHROMACLASH_ADDRESS, APPROVAL_COST],
+      args: [CHROMACLASH_ADDRESS, APPROVAL_COST], chainId: celo.id,
     });
     await refetchAllowance();
   }
@@ -102,7 +103,7 @@ export function usePixelPainter(pixels: Map<number, { colorIdx: number; owner: `
       try {
         await writeContractAsync({
           address: CHROMACLASH_ADDRESS, abi: CHROMACLASH_ABI, functionName: "placePixel",
-          args: [x, y, selectedColor],
+          args: [x, y, selectedColor], chainId: celo.id,
         });
         setOptimistic(prev => new Map(prev).set(idx, selectedColor));
         showToast("Pixel placed — confirming on-chain…", "#FCFF52");
@@ -123,7 +124,7 @@ export function usePixelPainter(pixels: Map<number, { colorIdx: number; owner: `
       await ensureAllowance(PIXEL_COST);
       await writeContractAsync({
         address: CHROMACLASH_ADDRESS, abi: CHROMACLASH_ABI, functionName: "placePixelPaid",
-        args: [x, y, selectedColor],
+        args: [x, y, selectedColor], chainId: celo.id,
       });
       setOptimistic(prev => new Map(prev).set(idx, selectedColor));
       showToast("Instant pixel — 0.01 USDM confirmed", "#4ADE80");
@@ -149,7 +150,7 @@ export function usePixelPainter(pixels: Map<number, { colorIdx: number; owner: `
       const colors = queue.map(q => q.c);
       await writeContractAsync({
         address: CHROMACLASH_ADDRESS, abi: CHROMACLASH_ABI, functionName: "placePixelBatch",
-        args: [xs, ys, colors],
+        args: [xs, ys, colors], chainId: celo.id,
       });
       showToast(`Batch painted — ${(Number(batchCost) / 1e18).toFixed(2)} USDM confirmed`, "#4ADE80");
       setQueue([]);

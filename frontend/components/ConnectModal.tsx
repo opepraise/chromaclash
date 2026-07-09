@@ -1,6 +1,7 @@
 "use client";
 
 import { useConnect } from "wagmi";
+import { celo } from "wagmi/chains";
 import Modal from "./Modal";
 import { useToast } from "@/lib/toast";
 
@@ -20,7 +21,7 @@ export default function ConnectModal({ onClose }: { onClose: () => void }) {
             key={c.uid}
             onClick={() => {
               connect(
-                { connector: c },
+                { connector: c, chainId: celo.id },
                 {
                   onSuccess: () => { showToast(`Connected via ${c.name}`, "#4ADE80"); onClose(); },
                   onError: (e) => showToast(e.message.slice(0, 80), "#FF5C5C"),
